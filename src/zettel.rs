@@ -38,7 +38,7 @@ impl Zettel {
     }
 
     fn timestamp(&self) -> String {
-        self.now.to_rfc3339()
+        format!("{:?}", self.now)
     }
 
     pub async fn render_to_file(&self, path: PathBuf) -> Result<String> {

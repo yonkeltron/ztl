@@ -1,7 +1,6 @@
 use anyhow::{anyhow, Result};
 use clap::{App, Arg, SubCommand};
 
-use async_std::path::{Path, PathBuf};
 use async_std::task;
 
 mod zettel;
