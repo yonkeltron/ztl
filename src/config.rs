@@ -2,6 +2,8 @@ use anyhow::{anyhow, Result};
 use confy;
 use serde::{Deserialize, Serialize};
 
+use async_std::path::PathBuf;
+
 #[derive(Deserialize, Serialize)]
 pub struct Config {
     pub zettelkasten_root: String,
@@ -23,9 +25,10 @@ impl Config {
         }
     }
 
-    pub fn init(root_path: &str) -> Result<Self> {
+    pub fn init(root_path_buf: PathBuf) -> Result<Self> {
+        let root_path_string = format!("{}", root_path_buf.display());
         let config = Config {
-            zettelkasten_root: String::from(root_path),
+            zettelkasten_root: root_path_string,
         };
 
         config.store()?;

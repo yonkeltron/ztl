@@ -1,6 +1,8 @@
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use clap::{App, Arg, SubCommand};
 
+use async_std::fs;
+use async_std::path::Path;
 use async_std::task;
 
 mod config;
@@ -11,13 +13,28 @@ use crate::zettel::Zettel;
 
 async fn new_zettel(name: &str, tags: Vec<String>) -> Result<()> {
     let zettel = Zettel::new(name, tags);
-    zettel.render_to_file().await?;
+    zettel
+        .render_to_file()
+        .await
+        .with_context(|| format!("Unable to initialize a new zettel"))?;
     Ok(())
 }
 
-async fn init_zettelkasten(path: &str) -> Result<()> {
-    Config::init(path)?;
-    Ok(())
+async fn init_zettelkasten(path_str: &str) -> Result<()> {
+    let path = Path::new(path_str);
+    if path.exists().await {
+        Err(anyhow!(
+            "Unable to initialize new zettelkasten because {} already exists",
+            path.display()
+        ))
+    } else {
+        fs::create_dir_all(path)
+            .await
+            .with_context(|| format!("Unable to initialize a new zettelkasten"))?;
+        let root = Path::new(path_str).canonicalize().await?;
+        Config::init(root)?;
+        Ok(())
+    }
 }
 
 fn main() -> Result<()> {
@@ -67,8 +84,6 @@ fn main() -> Result<()> {
                 .value_of("root_path")
                 .expect("unable to read root path");
             task::block_on(init_zettelkasten(path))
-                .expect("Unable to spawn 'init_zettelkasten' task");
-            Ok(())
         }
         ("new", Some(new_matches)) => {
             let name = new_matches.value_of("name").expect("Unable to read name");
@@ -76,8 +91,7 @@ fn main() -> Result<()> {
                 Some(vals) => vals.map(String::from).collect(),
                 None => vec![],
             };
-            task::block_on(new_zettel(name, tags)).expect("Unable to spawn 'new_zettel' task");
-            Ok(())
+            task::block_on(new_zettel(name, tags))
         }
         (&_, _matches) => Err(anyhow!("Unrecognized subcommand, try 'help'")),
     }
