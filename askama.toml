@@ -1,0 +1,5 @@
+[general]
+
+[[escaper]]
+path = "askama::Text"
+extensions = ["adoc", "asciidoc"]

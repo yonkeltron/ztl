@@ -1,0 +1,12 @@
+---
+
+---
+= {{ name }}
+:tags: {{ self.tags() }}
+:created_at: {{ self.timestamp() }}
+:slug: {{ slug }}
+:uuid: {{ uuid }}
+
+
+== Links
+

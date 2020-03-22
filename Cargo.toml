@@ -1,0 +1,20 @@
+[package]
+name = "ztl"
+version = "0.1.0"
+authors = ["Jonathan E. Magen <yonkeltron@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "ztl"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0"
+askama = "0.9"
+async-std = "1.5"
+chrono = "0.4"
+clap = "2.33"
+slug = "0.1.4"
+uuid = { version = "0.8", features = ["v4"] }
