@@ -7,6 +7,8 @@ use uuid::Uuid;
 use async_std::fs;
 use async_std::path::{Path, PathBuf};
 
+use crate::config::Config;
+
 #[derive(Debug, Template)]
 #[template(path = "zettel.adoc")]
 pub struct Zettel {
@@ -28,9 +30,9 @@ impl Zettel {
         }
     }
 
-    pub fn path_buf(&self) -> PathBuf {
-        let raw_path = format!("{}.adoc", self.slug);
-        Path::new(&raw_path).to_path_buf()
+    pub fn path_buf(&self, config: Config) -> PathBuf {
+        let fname = format!("{}.adoc", self.slug);
+        Path::new(&config.zettelkasten_root).join(&fname)
     }
 
     fn tags(&self) -> String {
@@ -41,9 +43,9 @@ impl Zettel {
         format!("{:?}", self.now)
     }
 
-    pub async fn render_to_file(&self) -> Result<String> {
+    pub async fn render_to_file(&self, config: Config) -> Result<String> {
         let adoc = self.render()?;
-        let path = self.path_buf();
+        let path = self.path_buf(config);
 
         if path.exists().await {
             Err(anyhow!(
@@ -55,5 +57,18 @@ impl Zettel {
 
             Ok(adoc)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tags() {
+        let tags = vec![String::from("panda"), String::from("bamboo")];
+        let zettel = Zettel::new("panda", tags);
+
+        assert_eq!("panda, bamboo", &zettel.tags());
     }
 }

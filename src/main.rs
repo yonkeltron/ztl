@@ -12,9 +12,10 @@ use crate::config::Config;
 use crate::zettel::Zettel;
 
 async fn new_zettel(name: &str, tags: Vec<String>) -> Result<()> {
+    let config = Config::load()?;
     let zettel = Zettel::new(name, tags);
     zettel
-        .render_to_file()
+        .render_to_file(config)
         .await
         .with_context(|| format!("Unable to initialize a new zettel"))?;
     Ok(())
