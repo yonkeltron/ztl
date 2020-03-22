@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use askama::Template;
 use chrono::{DateTime, Utc};
 use slug::slugify;
@@ -29,7 +29,7 @@ impl Zettel {
     }
 
     pub fn path_buf(&self) -> PathBuf {
-        let raw_path = format!("{}-{}.adoc", self.timestamp(), self.slug);
+        let raw_path = format!("{}.adoc", self.slug);
         Path::new(&raw_path).to_path_buf()
     }
 
@@ -41,11 +41,19 @@ impl Zettel {
         format!("{:?}", self.now)
     }
 
-    pub async fn render_to_file(&self, path: PathBuf) -> Result<String> {
+    pub async fn render_to_file(&self) -> Result<String> {
         let adoc = self.render()?;
+        let path = self.path_buf();
 
-        fs::write(path, &adoc).await?;
+        if path.exists().await {
+            Err(anyhow!(
+                "Refusing to create {} because it already exists",
+                path.display()
+            ))
+        } else {
+            fs::write(path, &adoc).await?;
 
-        Ok(adoc)
+            Ok(adoc)
+        }
     }
 }
