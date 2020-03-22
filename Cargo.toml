@@ -3,6 +3,10 @@ name = "ztl"
 version = "0.1.0"
 authors = ["Jonathan E. Magen <yonkeltron@gmail.com>"]
 edition = "2018"
+readme = "README.md"
+homepage = "https://github.com/yonkeltron/ztl"
+repository = "https://github.com/yonkeltron/ztl"
+license = "Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
