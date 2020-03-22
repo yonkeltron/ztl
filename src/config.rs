@@ -1,0 +1,42 @@
+use anyhow::{anyhow, Result};
+use confy;
+use serde::{Deserialize, Serialize};
+
+#[derive(Deserialize, Serialize)]
+pub struct Config {
+    pub zettelkasten_root: String,
+}
+
+impl ::std::default::Default for Config {
+    fn default() -> Self {
+        Self {
+            zettelkasten_root: String::from(""),
+        }
+    }
+}
+
+impl Config {
+    pub fn load() -> Result<Self> {
+        match confy::load("ztl") {
+            Ok(config) => Ok(config),
+            Err(e) => Err(anyhow!("Unable to open config file because {}", e)),
+        }
+    }
+
+    pub fn init(root_path: &str) -> Result<Self> {
+        let config = Config {
+            zettelkasten_root: String::from(root_path),
+        };
+
+        config.store()?;
+
+        Ok(config)
+    }
+
+    pub fn store(&self) -> Result<()> {
+        match confy::store("ztl", self) {
+            Ok(_) => Ok(()),
+            Err(e) => Err(anyhow!("Unable to save config file because {}", e)),
+        }
+    }
+}
