@@ -3,6 +3,7 @@ name = "ztl"
 version = "0.1.0"
 authors = ["Jonathan E. Magen <yonkeltron@gmail.com>"]
 edition = "2018"
+description = "Zettelkasten with AsciiDoc"
 readme = "README.md"
 homepage = "https://github.com/yonkeltron/ztl"
 repository = "https://github.com/yonkeltron/ztl"
