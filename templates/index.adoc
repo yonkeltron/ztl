@@ -1,0 +1,5 @@
+= Index
+:created_at: {{ self.timestamp() }}
+:uuid: {{ uuid }}
+
+== Entries

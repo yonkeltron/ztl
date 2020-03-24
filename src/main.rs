@@ -6,18 +6,26 @@ use async_std::path::Path;
 use async_std::task;
 
 mod config;
+mod index;
 mod zettel;
 
 use crate::config::Config;
+use crate::index::Index;
 use crate::zettel::Zettel;
 
 async fn new_zettel(name: &str, tags: Vec<String>) -> Result<()> {
     let config = Config::load()?;
     let zettel = Zettel::new(name, tags);
     zettel
-        .render_to_file(config)
+        .render_to_file(&config)
         .await
-        .with_context(|| format!("Unable to initialize a new zettel"))?;
+        .with_context(|| "Unable to initialize a new zettel")?;
+
+    zettel
+        .write_to_index(&config)
+        .await
+        .with_context(|| "Unable to write to index")?;
+
     Ok(())
 }
 
@@ -31,9 +39,10 @@ async fn init_zettelkasten(path_str: &str) -> Result<()> {
     } else {
         fs::create_dir_all(path)
             .await
-            .with_context(|| format!("Unable to initialize a new zettelkasten"))?;
+            .with_context(|| "Unable to initialize a new zettelkasten")?;
         let root = Path::new(path_str).canonicalize().await?;
-        Config::init(root)?;
+        Config::init(&root)?;
+        Index::init(&root).await?;
         Ok(())
     }
 }

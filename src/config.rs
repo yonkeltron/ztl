@@ -25,7 +25,7 @@ impl Config {
         }
     }
 
-    pub fn init(root_path_buf: PathBuf) -> Result<Self> {
+    pub fn init(root_path_buf: &PathBuf) -> Result<Self> {
         let root_path_string = format!("{}", root_path_buf.display());
         let config = Config {
             zettelkasten_root: root_path_string,
